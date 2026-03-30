@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interview Buddy™</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0f1a;
+  --bg2: #131829;
+  --card: rgba(255,255,255,.04);
+  --card-border: rgba(255,255,255,.08);
+  --card-hover: rgba(255,255,255,.07);
+  --text: #e8eaf0;
+  --text-dim: #7a82a0;
+  --text-bright: #ffffff;
+  --accent: #6c63ff;
+  --accent2: #a78bfa;
+  --accent-glow: rgba(108,99,255,.25);
+  --success: #34d399;
+  --success-bg: rgba(52,211,153,.1);
+  --danger: #f87171;
+  --danger-bg: rgba(248,113,113,.1);
+  --warn: #fbbf24;
+  --warn-bg: rgba(251,191,36,.1);
+  --neutral-bg: rgba(108,99,255,.08);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  color: var(--text);
+  line-height: 1.65;
+  overflow-x: hidden;
+}
+
+/* Ambient background glow */
+body::before {
+  content: '';
+  position: fixed;
+  top: -40%; left: -20%;
+  width: 80%; height: 80%;
+  background: radial-gradient(ellipse, rgba(108,99,255,.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -30%; right: -20%;
+  width: 70%; height: 70%;
+  background: radial-gradient(ellipse, rgba(167,139,250,.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+#app {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 32px 20px;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 40px 36px;
+  margin-top: 20px;
+  position: relative;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.1), transparent);
+}
+
+/* ===== SCREEN TRANSITIONS ===== */
+.screen { animation: screenIn .5s cubic-bezier(.16,1,.3,1); }
+@keyframes screenIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== HEADER ===== */
+.header { text-align: center; padding: 8px 0 0; }
+.logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-bright);
+  letter-spacing: -.5px;
+}
+.logo span {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.tagline {
+  font-size: .78rem;
+  color: var(--text-dim);
+  margin-top: 3px;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* ===== PROGRESS ===== */
+.progress-wrap { margin: 24px 0 0; }
+.progress-text {
+  font-size: .75rem;
+  color: var(--text-dim);
+  text-align: right;
+  margin-bottom: 6px;
+  font-weight: 600;
+  letter-spacing: .5px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.progress-bar-bg {
+  background: rgba(255,255,255,.06);
+  border-radius: 100px;
+  height: 4px;
+  overflow: hidden;
+}
+.progress-bar {
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  height: 100%;
+  border-radius: 100px;
+  transition: width .7s cubic-bezier(.16,1,.3,1);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* ===== PREAMBLE ===== */
+.preamble h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 24px;
+  line-height: 1.3;
+}
+.preamble p {
+  color: var(--text);
+  margin-bottom: 14px;
+  font-size: .92rem;
+  opacity: .85;
+}
+.preamble strong { color: var(--text-bright); font-weight: 700; }
+.preamble em { color: var(--accent2); font-style: italic; }
+.preamble .warn {
+  font-size: .78rem;
+  color: var(--text-dim);
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--card-border);
+  font-style: italic;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 36px;
+  border-radius: var(--radius-sm);
+  font-size: .9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all .25s cubic-bezier(.16,1,.3,1);
+  font-family: 'Inter', sans-serif;
+  letter-spacing: .2px;
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+  box-shadow: 0 4px 20px var(--accent-glow);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(108,99,255,.4);
+}
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+.btn-secondary {
+  background: rgba(255,255,255,.06);
+  color: var(--text);
+  border: 1px solid var(--card-border);
+}
+.btn-secondary:hover {
+  background: rgba(255,255,255,.1);
+  border-color: rgba(255,255,255,.15);
+}
+
+/* ===== QUESTION ===== */
+.q-number {
+  font-size: .7rem;
+  font-weight: 700;
+  color: var(--accent2);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.q-prompt {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin-bottom: 28px;
+  line-height: 1.55;
+}
+
+/* ===== OPTION BUTTONS ===== */
+.options { display: flex; flex-direction: column; gap: 10px; }
+.opt-btn {
+  display: block;
+  width: 100%;
+  padding: 15px 20px;
+  border-radius: var(--radius-sm);
+  font-size: .9rem;
+  cursor: pointer;
+  border: 1px solid var(--card-border);
+  background: rgba(255,255,255,.02);
+  text-align: left;
+  transition: all .2s cubic-bezier(.16,1,.3,1);
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+  position: relative;
+}
+.opt-btn:hover {
+  border-color: rgba(108,99,255,.4);
+  background: rgba(108,99,255,.06);
+  transform: translateX(4px);
+}
+.opt-btn.selected {
+  border-color: var(--accent);
+  background: rgba(108,99,255,.1);
+  color: var(--text-bright);
+  font-weight: 600;
+  box-shadow: 0 0 20px rgba(108,99,255,.1);
+}
+.opt-btn.selected::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--accent), var(--accent2));
+  border-radius: 3px 0 0 3px;
+}
+
+/* ===== TMNT CARDS ===== */
+.tmnt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+.tmnt-card {
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 20px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .3s cubic-bezier(.16,1,.3,1);
+  background: rgba(255,255,255,.02);
+  position: relative;
+  overflow: hidden;
+}
+.tmnt-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  opacity: 0;
+  transition: opacity .3s;
+}
+.tmnt-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255,255,255,.15);
+  box-shadow: 0 8px 30px rgba(0,0,0,.3);
+}
+.tmnt-card.selected { border-width: 2px; }
+.tmnt-card .name {
+  font-weight: 700;
+  font-size: .88rem;
+  margin-top: 10px;
+  position: relative;
+}
+.tmnt-card .weapon {
+  font-size: .72rem;
+  color: var(--text-dim);
+  margin-top: 2px;
+  position: relative;
+}
+
+/* ===== NUMBER INPUT ===== */
+.num-input-wrap {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.num-input {
+  width: 120px;
+  padding: 12px 16px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  font-size: 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  text-align: center;
+  outline: none;
+  transition: all .2s;
+  background: rgba(255,255,255,.04);
+  color: var(--text-bright);
+}
+.num-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+.num-input::placeholder { color: var(--text-dim); }
+.num-label { font-size: .85rem; color: var(--text-dim); }
+.divider-or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0;
+  color: var(--text-dim);
+  font-size: .78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+.divider-or::before, .divider-or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--card-border);
+}
+
+/* ===== YES/NO ===== */
+.yn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.yn-btn {
+  padding: 18px;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--card-border);
+  background: rgba(255,255,255,.03);
+  transition: all .25s cubic-bezier(.16,1,.3,1);
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+}
+.yn-btn:hover {
+  border-color: var(--accent);
+  background: rgba(108,99,255,.08);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(108,99,255,.15);
+}
+
+/* ===== MINESWEEPER ===== */
+.mine-wrap { text-align: center; }
+.mine-grid { display: inline-grid; gap: 3px; margin: 0 auto; user-select: none; }
+.mine-cell {
+  width: 44px; height: 44px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+  font-size: .85rem;
+  cursor: pointer;
+  transition: all .1s;
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 0;
+}
+.mine-cell.hidden {
+  background: rgba(108,99,255,.15);
+  border: 1px solid rgba(108,99,255,.25);
+}
+.mine-cell.hidden:hover {
+  background: rgba(108,99,255,.25);
+  transform: scale(1.05);
+}
+.mine-cell.revealed {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.06);
+  cursor: default;
+}
+.mine-cell.mine { background: var(--danger-bg); border-color: rgba(248,113,113,.3); }
+.mine-cell.flagged { background: var(--warn-bg); border-color: rgba(251,191,36,.3); }
+.timer-display {
+  font-size: 3rem;
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-bright);
+}
+.timer-display.urgent {
+  color: var(--danger);
+  animation: timerPulse .5s ease infinite alternate;
+}
+@keyframes timerPulse { from{opacity:1;transform:scale(1)} to{opacity:.6;transform:scale(1.05)} }
+.mine-hint {
+  font-size: .7rem;
+  color: var(--text-dim);
+  margin-top: 12px;
+  letter-spacing: .3px;
+}
+
+/* ===== REACTION TEST ===== */
+.react-circle {
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  margin: 24px auto;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .9rem;
+  font-weight: 600;
+  color: rgba(255,255,255,.9);
+  transition: all .2s cubic-bezier(.16,1,.3,1);
+  user-select: none;
+  position: relative;
+}
+.react-circle.waiting {
+  background: rgba(255,255,255,.08);
+  border: 2px solid rgba(255,255,255,.1);
+}
+.react-circle.ready {
+  background: rgba(239,68,68,.2);
+  border: 2px solid rgba(239,68,68,.4);
+  box-shadow: 0 0 40px rgba(239,68,68,.15);
+}
+.react-circle.go {
+  background: rgba(34,197,94,.2);
+  border: 2px solid rgba(34,197,94,.5);
+  box-shadow: 0 0 60px rgba(34,197,94,.2);
+  animation: goGlow .3s ease;
+}
+@keyframes goGlow { from{transform:scale(.95)} to{transform:scale(1)} }
+.react-circle.clicked {
+  background: rgba(255,255,255,.06);
+  border: 2px solid rgba(255,255,255,.1);
+}
+.react-ms {
+  font-size: 2.8rem;
+  font-weight: 900;
+  text-align: center;
+  margin-top: 16px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-bright);
+}
+
+/* ===== CAPTCHA ===== */
+.captcha-box {
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  max-width: 360px;
+  margin: 0 auto;
+  background: var(--card);
+}
+.captcha-header {
+  background: linear-gradient(135deg, #4285f4, #5a95f5);
+  color: #fff;
+  padding: 12px 18px;
+  font-size: .82rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.captcha-header::before {
+  content: '\u{1F6E1}';
+  font-size: 1rem;
+}
+.captcha-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 4px;
+}
+.captcha-cell {
+  aspect-ratio: 1;
+  background: rgba(255,255,255,.03);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: all .2s;
+  border-radius: 4px;
+  padding: 4px;
+}
+.captcha-cell .emoji { font-size: 2.4rem; }
+.captcha-cell .label { font-size: .62rem; color: var(--text-dim); margin-top: 3px; }
+.captcha-cell.selected {
+  background: rgba(66,133,244,.15);
+  outline: 2px solid #4285f4;
+  outline-offset: -2px;
+}
+.captcha-cell.selected::after {
+  content: '\u2713';
+  position: absolute;
+  top: 4px; right: 4px;
+  background: #4285f4;
+  color: #fff;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .65rem; font-weight: 700;
+}
+.captcha-footer {
+  padding: 12px 16px;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid rgba(255,255,255,.05);
+}
+.captcha-verify {
+  background: #4285f4;
+  color: #fff;
+  border: none;
+  padding: 8px 24px;
+  border-radius: 6px;
+  font-size: .82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: all .2s;
+}
+.captcha-verify:hover { background: #5a95f5; }
+
+/* ===== TOILET PAPER ===== */
+.tp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.tp-card {
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .3s cubic-bezier(.16,1,.3,1);
+  background: rgba(255,255,255,.02);
+}
+.tp-card:hover {
+  border-color: rgba(108,99,255,.3);
+  background: rgba(108,99,255,.05);
+  transform: translateY(-2px);
+}
+.tp-card.selected {
+  border-color: var(--accent);
+  background: rgba(108,99,255,.08);
+  box-shadow: 0 0 24px rgba(108,99,255,.1);
+}
+.tp-label {
+  font-weight: 700;
+  font-size: .9rem;
+  margin-top: 14px;
+  color: var(--text);
+}
+
+/* ===== TYPING TEST ===== */
+.type-target {
+  font-family: 'Playfair Display', serif;
+  font-size: .92rem;
+  font-style: italic;
+  color: var(--text);
+  background: rgba(255,255,255,.03);
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 18px;
+  line-height: 1.8;
+  border: 1px solid var(--card-border);
+  letter-spacing: .3px;
+}
+.type-input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  font-size: .92rem;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: all .2s;
+  background: rgba(255,255,255,.04);
+  color: var(--text-bright);
+}
+.type-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+/* ===== SLIDER ===== */
+.slider-wrap { margin: 24px 0; }
+.slider-value {
+  text-align: center;
+  font-size: 3.5rem;
+  font-weight: 900;
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.slider {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 100px;
+  background: rgba(255,255,255,.08);
+  outline: none;
+}
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  cursor: pointer;
+  border: 3px solid var(--bg);
+  box-shadow: 0 0 16px var(--accent-glow);
+  transition: transform .15s;
+}
+.slider::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: .72rem;
+  color: var(--text-dim);
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+/* ===== FEEDBACK ===== */
+.feedback-box {
+  margin-top: 28px;
+  padding: 20px 24px;
+  border-radius: var(--radius-sm);
+  font-size: .92rem;
+  line-height: 1.65;
+  animation: feedbackIn .4s cubic-bezier(.16,1,.3,1);
+  border-left: 3px solid;
+}
+.feedback-box.positive {
+  background: var(--success-bg);
+  border-color: var(--success);
+  color: var(--success);
+}
+.feedback-box.negative {
+  background: var(--danger-bg);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.feedback-box.neutral {
+  background: var(--neutral-bg);
+  border-color: var(--accent);
+  color: var(--accent2);
+}
+@keyframes feedbackIn {
+  from { opacity: 0; transform: translateY(12px) scale(.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.next-btn-wrap {
+  margin-top: 24px;
+  text-align: right;
+  opacity: 0;
+  animation: fadeUp .4s .9s cubic-bezier(.16,1,.3,1) forwards;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== RESULTS ===== */
+.results h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 6px;
+}
+.results .subtitle {
+  color: var(--text-dim);
+  font-size: .85rem;
+  margin-bottom: 32px;
+}
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--card-border);
+}
+.result-label {
+  font-size: .72rem;
+  color: var(--text-dim);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.result-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  text-align: right;
+}
+.result-score-wrap { text-align: center; margin: 32px 0; }
+.result-score-num {
+  font-size: 5rem;
+  font-weight: 900;
+  font-family: 'JetBrains Mono', monospace;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+.result-score-label {
+  font-size: .8rem;
+  color: var(--text-dim);
+  margin-top: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.result-rec {
+  margin-top: 28px;
+  padding: 18px 22px;
+  background: rgba(255,255,255,.03);
+  border-radius: var(--radius-sm);
+  font-size: .85rem;
+  color: var(--text-dim);
+  text-align: center;
+  font-style: italic;
+  border: 1px solid var(--card-border);
+  line-height: 1.7;
+}
+.dl-btn { margin-top: 24px; }
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  margin-top: 24px;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 3px; }
+
+/* ===== MOBILE ===== */
+@media (max-width: 500px) {
+  #app { padding: 16px 12px; }
+  .card { padding: 28px 20px; }
+  .tmnt-grid { gap: 10px; }
+  .mine-cell { width: 38px; height: 38px; font-size: .75rem; }
+  .react-circle { width: 160px; height: 160px; }
+  .q-prompt { font-size: 1.05rem; }
+  .preamble h2 { font-size: 1.4rem; }
+  .result-score-num { font-size: 3.5rem; }
+  .slider-value { font-size: 2.5rem; }
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ============================
+// STATE
+// ============================
+const state = {
+  screen: 'landing',
+  qi: 0,
+  answers: [],
+  baseScore: Math.floor(Math.random()*27)+41,
+  deductions: 0,
+  feedbackMsg: '',
+  feedbackType: 'neutral',
+  timers: []
+};
+
+function clearTimers(){ state.timers.forEach(t=>{ clearInterval(t); clearTimeout(t); }); state.timers=[]; }
+
+// ============================
+// QUESTIONS
+// ============================
+const questions = [
+  { id:1, title:'Question 01 / 15', prompt:"Who's your guy?", type:'tmnt' },
+  { id:2, title:'Question 02 / 15', prompt:'In a single sitting, how many hot dogs can you eat?', type:'hotdog' },
+  { id:3, title:'Question 03 / 15', prompt:"Your dog has been kidnapped and is being held at a location 30 minutes away. You\u2019re driving to rescue him. It\u2019s a warm night. Your windows are down. Do you listen to music on the drive there?", type:'yesno',
+    getResponse(a){ return a==='Yes'?{msg:"Correct. Every rescue mission needs a soundtrack. You understand this instinctively.",type:'positive',ded:0}:{msg:"Your dog is out there, scared and alone, and you can\u2019t even give him the dignity of a heroic arrival? No music? Just the sound of your own breathing and the hum of the engine for 30 minutes? Sociopathic. \u22121 point.",type:'negative',ded:1};}
+  },
+  { id:4, title:'Question 04 / 15', prompt:'Do you believe in ghosts?', type:'yesno',
+    getResponse(a){ return a==='Yes'?{msg:'Defects in critical thinking detected. \u22121 point.',type:'negative',ded:1}:{msg:'Correct. But you should know the office is haunted.',type:'neutral',ded:0};}
+  },
+  { id:5, title:'Question 05 / 15', prompt:'Complete this game of Minesweeper.', type:'minesweeper' },
+  { id:6, title:'Question 06 / 15', prompt:'Complete the lyric: \u201cIf there\u2019s a bustle in your hedgerow\u2026\u201d', type:'choice',
+    options:[{label:'\u201c\u2026you should probably call an exterminator\u201d',key:'A'},{label:'\u201c\u2026don\u2019t be alarmed now\u201d',key:'B'},{label:'\u201c\u2026it means spring has finally come\u201d',key:'C'},{label:'\u201c\u2026check your property line\u201d',key:'D'}],
+    getResponse(a){ return a==='B'?{msg:'Correct. You may proceed.',type:'positive',ded:0}:{msg:'Shows unawareness of cultural touchstones. Concerning.',type:'negative',ded:1};}
+  },
+  { id:7, title:'Question 07 / 15', prompt:'What temperature do you set your thermostat to at home?', type:'thermostat' },
+  { id:8, title:'Question 08 / 15', prompt:'Which way does the toilet paper go?', type:'tp' },
+  { id:9, title:'Question 09 / 15', prompt:'Click the button the moment it turns green.', type:'reaction' },
+  { id:10, title:'Question 10 / 15', prompt:'', type:'captcha' },
+  { id:11, title:'Question 11 / 15', prompt:'What do you see in this image?', type:'rorschach' },
+  { id:12, title:'Question 12 / 15', prompt:'You are in an elevator alone. The doors close. How many seconds do you wait before checking your phone?', type:'elevator' },
+  { id:13, title:'Question 13 / 15', prompt:'Type the following sentence exactly. You have 10 seconds.', type:'typing' },
+  { id:14, title:'Question 14 / 15', prompt:'You find a $20 bill on the ground in an empty parking lot. On a scale of 1\u201310, how hard do you try to find the owner?', type:'slider' },
+  { id:15, title:'Question 15 / 15', prompt:'Last question. Are you a good person?', type:'yesno',
+    getResponse(a){ return a==='Yes'?{msg:'The confidence is noted. Narcissism assessment: flagged for review.',type:'negative',ded:1}:{msg:"At least you\u2019re honest. That\u2019s more than most people who answered \u2018Yes\u2019 can say.",type:'positive',ded:0};}
+  }
+];
+
+// ============================
+// RENDER ENGINE
+// ============================
+const $=id=>document.getElementById(id);
+const app=()=>document.getElementById('app');
+
+function render(){
+  clearTimers();
+  const el=app();
+  el.innerHTML='';
+  if(state.screen==='landing') renderLanding(el);
+  else if(state.screen==='question') renderQuestion(el);
+  else if(state.screen==='feedback') renderFeedback(el);
+  else if(state.screen==='results') renderResults(el);
+}
+
+function renderLanding(el){
+  el.innerHTML=`
+  <div class="screen">
+    <div class="header">
+      <div class="logo">Interview <span>Buddy</span>\u2122</div>
+      <div class="tagline">Character Assessment Platform</div>
+    </div>
+    <div class="card preamble">
+      <h2>Welcome to your character evaluation.</h2>
+      <p>Technical skills can be taught. Domain knowledge can be acquired. But <strong>character</strong> is immutable.</p>
+      <p>This assessment does not measure what you know. It measures <em>who you are</em> \u2014 at a molecular level.</p>
+      <p>Your results are final and will be kept on file permanently.</p>
+      <p class="warn">By proceeding, you consent to a full and irreversible evaluation of your personhood. This cannot be undone.</p>
+      <div style="text-align:center;margin-top:28px">
+        <button class="btn btn-primary" onclick="startAssessment()">Begin Assessment</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function startAssessment(){ state.screen='question'; state.qi=0; render(); }
+
+function renderQuestion(el){
+  const q=questions[state.qi];
+  const pct=((state.qi)/15*100);
+  el.innerHTML=`
+  <div class="screen">
+    <div class="header"><div class="logo">Interview <span>Buddy</span>\u2122</div></div>
+    <div class="progress-wrap">
+      <div class="progress-text">${q.title}</div>
+      <div class="progress-bar-bg"><div class="progress-bar" style="width:${pct}%"></div></div>
+    </div>
+    <div class="card" id="q-card"></div>
+  </div>`;
+  const card=$('q-card');
+  renderByType(card,q);
+}
+
+function renderByType(card,q){
+  switch(q.type){
+    case 'tmnt': renderTMNT(card,q); break;
+    case 'hotdog': renderHotdog(card,q); break;
+    case 'yesno': renderYesNo(card,q); break;
+    case 'choice': renderChoice(card,q); break;
+    case 'minesweeper': renderMinesweeper(card,q); break;
+    case 'thermostat': renderThermostat(card,q); break;
+    case 'tp': renderTP(card,q); break;
+    case 'reaction': renderReaction(card,q); break;
+    case 'captcha': renderCaptcha(card,q); break;
+    case 'rorschach': renderRorschach(card,q); break;
+    case 'elevator': renderElevator(card,q); break;
+    case 'typing': renderTyping(card,q); break;
+    case 'slider': renderSlider(card,q); break;
+  }
+}
+
+// ============================
+// QUESTION RENDERERS
+// ============================
+
+function renderTMNT(card,q){
+  const turtles=[
+    {name:'Leonardo',color:'#60a5fa',mask:'#3b82f6',weapon:'Katana'},
+    {name:'Donatello',color:'#a78bfa',mask:'#8b5cf6',weapon:'B\u014d Staff'},
+    {name:'Michelangelo',color:'#fbbf24',mask:'#f59e0b',weapon:'Nunchucks'},
+    {name:'Raphael',color:'#f87171',mask:'#ef4444',weapon:'Sai'}
+  ];
+  card.innerHTML=`<div class="q-number">${q.title}</div><div class="q-prompt">${q.prompt}</div>
+    <div class="tmnt-grid" id="tmnt-grid"></div>
+    <div style="text-align:right"><button class="btn btn-primary" id="tmnt-submit" disabled onclick="submitTMNT()">Submit</button></div>`;
+  const grid=$('tmnt-grid');
+  let selected=null;
+  turtles.forEach(t=>{
+    const div=document.createElement('div');
+    div.className='tmnt-card';
+    div.innerHTML=`
+      <svg width="90" height="90" viewBox="0 0 90 90" style="display:block;margin:0 auto">
+        <defs>
+          <radialGradient id="g-${t.name}" cx="40%" cy="35%"><stop offset="0%" stop-color="#6ee7b7"/><stop offset="100%" stop-color="#34d399"/></radialGradient>
+        </defs>
+        <circle cx="45" cy="46" r="34" fill="url(#g-${t.name})"/>
+        <ellipse cx="45" cy="50" rx="22" ry="13" fill="#22c55e" opacity=".6"/>
+        <rect x="10" y="34" width="70" height="16" rx="8" fill="${t.mask}" opacity=".9"/>
+        <circle cx="33" cy="41" r="8" fill="white" opacity=".95"/><circle cx="57" cy="41" r="8" fill="white" opacity=".95"/>
+        <circle cx="34" cy="41" r="4" fill="#1e1e2e"/><circle cx="58" cy="41" r="4" fill="#1e1e2e"/>
+        <circle cx="35.5" cy="39.5" r="1.5" fill="white" opacity=".7"/><circle cx="59.5" cy="39.5" r="1.5" fill="white" opacity=".7"/>
+        <path d="M33 58 Q45 65 57 58" stroke="#15803d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      </svg>
+      <div class="name" style="color:${t.color}">${t.name}</div>
+      <div class="weapon">${t.weapon}</div>`;
+    div.onclick=()=>{
+      selected=t.name;
+      grid.querySelectorAll('.tmnt-card').forEach(c=>{c.classList.remove('selected');c.style.borderColor='';});
+      div.classList.add('selected');
+      div.style.borderColor=t.mask;
+      div.style.boxShadow='0 0 30px '+t.mask+'33';
+      $('tmnt-submit').disabled=false;
+    };
+    grid.appendChild(div);
+  });
+  window.submitTMNT=()=>{
+    if(!selected)return;
+    if(selected==='Raphael') showFeedback('There was only one wrong answer here, and you picked it.','negative',1);
+    else showFeedback('Fine choice.','positive',0);
+  };
+}
+
+function renderHotdog(card,q){
+  card.innerHTML=`<div class="q-number">${q.title}</div><div class="q-prompt">${q.prompt}</div>
+    <div class="num-input-wrap">
+      <input type="number" class="num-input" id="hd-num" min="1" max="99" placeholder="#">
+      <span class="num-label">hot dogs</span>
+      <button class="btn btn-primary" onclick="submitHD(false)">Submit</button>
+    </div>
+    <div class="divider-or">or</div>
+    <button class="opt-btn" onclick="submitHD(true)" style="text-align:center">0 \u2014 I don\u2019t eat hot dogs / am vegetarian</button>`;
+  window.submitHD=(veg)=>{
+    if(veg) return showFeedback("It\u2019s good to identify defective applicants early.",'negative',2);
+    const n=parseInt($('hd-num').value);
+    if(isNaN(n)||n<1){$('hd-num').style.borderColor='var(--danger)';return;}
+    if(n<=3) showFeedback("Pathetic. I don\u2019t think you have what it takes.",'negative',0);
+    else if(n<=5) showFeedback('A respectable number.','positive',0);
+    else showFeedback('Show some restraint.','neutral',0);
+  };
+}
+
+function renderYesNo(card,q){
+  card.innerHTML=`<div class="q-number">${q.title}</div><div class="q-prompt">${q.prompt}</div>
+    <div class="yn-grid">
+      <button class="yn-btn" onclick="submitYN('Yes')">Yes</button>
+      <button class="yn-btn" onclick="submitYN('No')">No</button>
+    </div>`;
+  window.submitYN=(a)=>{const r=q.getResponse(a);showFeedback(r.msg,r.type,r.ded);};
+}
+
+function renderChoice(card,q){
+  let sel=null;
+  card.innerHTML=`<div class="q-number">${q.title}</div><div class="q-prompt">${q.prompt}</div>
+    <div class="options" id="choice-opts"></div>
+    <div style="text-align:right;margin-top:20px"><button class="btn btn-primary" id="choice-sub" disabled onclick="submitChoice()">Submit</button></div>`;
+  const opts=$('choice-opts');
+  q.options.forEach(o=>{
+    const btn=document.createElement('button');
+    btn.className='opt-btn';
+    btn.textContent=o.label;
+    btn.onclick=()=>{
+      sel=o.key;
+      opts.querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      $('choice-sub').disabled=false;
+    };
+    opts.appendChild(btn);
+  });
+  window.submitChoice=()=>{if(!sel)return;const r=q.getResponse(sel);showFeedback(r.msg,r.type,r.ded);};
+}
+
+function renderMinesweeper(card,q){
+  const ROWS=6,COLS=6,MINES=6;
+  let board=[],revealed=[],flagged=[],gameOver=false,firstClick=true,timeLeft=15,won=false;
+  for(let r=0;r<ROWS;r++){board[r]=[];revealed[r]=[];flagged[r]=[];for(let c=0;c<COLS;c++){board[r][c]=0;revealed[r][c]=false;flagged[r][c]=false;}}
+
+  function placeMines(sr,sc){
+    let placed=0,attempts=0;
+    while(placed<MINES&&attempts<1000){
+      attempts++;
+      let r=Math.floor(Math.random()*ROWS),c=Math.floor(Math.random()*COLS);
+      if(board[r][c]===-1)continue;
+      if(Math.abs(r-sr)<=1&&Math.abs(c-sc)<=1)continue;
+      board[r][c]=-1;placed++;
+    }
+    for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+      if(board[r][c]===-1)continue;
+      let cnt=0;
+      for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
+        let nr=r+dr,nc=c+dc;
+        if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS&&board[nr][nc]===-1)cnt++;
+      }
+      board[r][c]=cnt;
+    }
+  }
+
+  function reveal(r,c){
+    if(gameOver||revealed[r][c]||flagged[r][c])return;
+    if(firstClick){placeMines(r,c);firstClick=false;}
+    revealed[r][c]=true;
+    if(board[r][c]===-1){gameOver=true;revealAll();showFeedback('Does not perform well under pressure.','negative',1);return;}
+    if(board[r][c]===0){
+      for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
+        let nr=r+dr,nc=c+dc;
+        if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS)reveal(nr,nc);
+      }
+    }
+    if(checkWin()){gameOver=true;won=true;showFeedback('Acceptable. Barely.','positive',0);}
+    drawBoard();
+  }
+
+  function checkWin(){
+    for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(board[r][c]!==-1&&!revealed[r][c])return false;
+    return true;
+  }
+
+  function revealAll(){for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)revealed[r][c]=true;drawBoard();}
+
+  const numColors=['','#60a5fa','#34d399','#f87171','#818cf8','#f472b6','#22d3ee','#e2e8f0','#94a3b8'];
+
+  function drawBoard(){
+    const g=$('mine-grid');if(!g)return;
+    g.innerHTML='';
+    for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+      const btn=document.createElement('button');
+      btn.className='mine-cell';
+      if(revealed[r][c]){
+        if(board[r][c]===-1){btn.classList.add('mine');btn.textContent='\u{1F4A3}';}
+        else{btn.classList.add('revealed');if(board[r][c]>0){btn.textContent=board[r][c];btn.style.color=numColors[board[r][c]];}}
+      }else{
+        btn.classList.add('hidden');
+        if(flagged[r][c]){btn.classList.add('flagged');btn.textContent='\u{1F6A9}';}
+        btn.onclick=()=>reveal(r,c);
+        btn.oncontextmenu=(e)=>{e.preventDefault();if(!gameOver){flagged[r][c]=!flagged[r][c];drawBoard();}};
+      }
+      g.appendChild(btn);
+    }
+  }
+
+  card.innerHTML=`<div class="q-number">${q.title}</div><div class="q-prompt">${q.prompt}</div>
+    <div class="mine-wrap">
+      <div class="timer-display" id="mine-timer">15</div>
+      <div class="mine-grid" id="mine-grid" style="grid-template-columns:repeat(${COLS},44px)"></div>
+      <div class="mine-hint">Left-click: reveal \u00b7 Right-click: flag</div>
+    </div>`;
+  drawBoard();
+  const tid=setInterval(()=>{
+    timeLeft--;
+    const te=$('mine-timer');
+    if(te){te.textContent=timeLeft;if(timeLeft<=5)te.classList.add('urgent');}
+    if(timeLeft<=0){clearInterval(tid);if(!gameOver&&!won){gameOver=true;revealAll();showFeedback('Does not perform well under pressure.','negative',1);}}
+  },1000);
+  state.timers.push(tid);
+}
+
+function renderThermostat(card,q){
+  card.innerHTML=`<div class="q-number">${q.title}</div><div class="q-prompt">${q.prompt}</div>
+    <div class="num-input-wrap">
+      <input type="number" class="num-input" id="therm-num" min="40" max="100" placeholder="\u00b0F" style="width:100px">
+      <span class="num-label">\u00b0F</span>
+      <button class="btn btn-primary" onclick="submitTherm()">Submit</button>
+    </div>`;
+  window.submitTherm=()=>{
+    const n=parseInt($('therm-num').value);
+    if(isNaN(n)){$('therm-num').style.borderColor='var(--danger)';return;}
+    if(n<65) showFeedback('You live in a meat locker. This suggests deep psychological issues.','negative',0);
+    else if(n<=67) showFeedback('Frugal to the point of cruelty. Your guests suffer in silence.','negative',0);
+    else if(n<=72) showFeedback('Normal. Suspiciously normal.','neutral',0);
+    else if(n<=76) showFeedback('Comfortable. Soft. Unlikely to survive any kind of hardship.','neutral',0);
+    else showFeedback("You\u2019re the reason the planet is dying.",'negative',1);
+  };
+}
+
+function renderTP(card,q){
+  let sel=null;
+  // Clear, recognizable side-view toilet paper diagrams
+  const svgOver=`<svg width="130" height="140" viewBox="0 0 130 140" style="display:block;margin:0 auto">
+    <!-- Wall bracket -->
+    <rect x="18" y="24" width="8" height="92" rx="3" fill="rgba(255,255,255,.18)"/>
+    <rect x="22" y="28" width="20" height="8" rx="2" fill="rgba(255,255,255,.15)"/>
+    <!-- Roll (side view) -->
+    <circle cx="65" cy="68" r="34" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.15)" stroke-width="2"/>
+    <circle cx="65" cy="68" r="14" fill="rgba(12,15,26,.8)" stroke="rgba(255,255,255,.12)" stroke-width="1.5"/>
+    <!-- Holder rod through center -->
+    <line x1="26" y1="68" x2="104" y2="68" stroke="rgba(255,255,255,.2)" stroke-width="3" stroke-linecap="round"/>
+    <!-- Paper hanging OVER (from top, toward viewer) -->
+    <path d="M65 34 Q98 34 98 50 L98 68 L98 95 Q98 105 88 105 L78 105" fill="rgba(167,139,250,.15)" stroke="rgba(167,139,250,.5)" stroke-width="2" stroke-linecap="round" fill-opacity=".8"/>
+    <!-- Arrow showing direction -->
+    <path d="M88 98 L78 105 L88 112" fill="none" stroke="rgba(167,139,250,.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Label -->
+    <text x="88" y="125" fill="rgba(167,139,250,.5)" font-size="10" font-family="Inter,sans-serif" font-weight="600">OVER</text>
+  </svg>`;
+  const svgUnder=`<svg width="130" height="140" viewBox="0 0 130 140" style="display:block;margin:0 auto">
+    <!-- Wall bracket -->
+    <rect x="18" y="24" width="8" height="92" rx="3" fill="rgba(255,255,255,.18)"/>
+    <rect x="22" y="28" width="20" height="8" rx="2" fill="rgba(255,255,255,.15)"/>
+    <!-- Roll (side view) -->
+    <circle cx="65" cy="68" r="34" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.15)" stroke-width="2"/>
+    <circle cx="65" cy="68" r="14" fill="rgba(12,15,26,.8)" stroke="rgba(255,255,255,.12)" stroke-width="1.5"/>
+    <!-- Holder rod through center -->
+    <line x1="26" y1="68" x2="104" y2="68" stroke="rgba(255,255,255,.2)" stroke-width="3" stroke-linecap="round"/>
+    <!-- Paper hanging UNDER (from bottom of roll, draping down behind) -->
+    <path d="M65 102 Q32 102 32 86 L32 68 L32 50 Q32 40 42 40 L52 40" fill="rgba(255,255,255,.1)" stroke="rgba(255,255,255,.3)" stroke-width="2" stroke-linecap="round" fill-opacity=".6"/>
+    <!-- Arrow at the bottom showing paper comes from underneath -->
+    <path d="M58 95 L65 102 L72 95" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Label -->
+    <text x="30" y="125" fill="rgba(255,255,255,.3)" font-size="10" font-family="Inter,sans-serif" font-weight="600">UNDER</text>
+  </svg>`;
+  card.innerHTML=`<div class="q-number">${q.title}</div><div class="q-prompt">${q.prompt}</div>
+    <div class="tp-grid">
+      <div class="tp-card" id="tp-over" onclick="selTP('over')">${svgOver}<div class="tp-label">Over</div></div>
+      <div class="tp-card" id="tp-under" onclick="selTP('under')">${svgUnder}<div class="tp-label">Under</div></div>
+    </div>
+    <div style="text-align:right"><button class="btn btn-primary" id="tp-sub" disabled onclick="submitTP()">Submit</button></div>`;
+  window.selTP=(v)=>{
+    sel=v;
+    $('tp-over').classList.toggle('selected',v==='over');
+    $('tp-under').classList.toggle('selected',v==='under');
+    $('tp-sub').disabled=false;
+  };
+  window.submitTP=()=>{
+    if(!sel)return;
+    if(sel==='over') showFeedback('Correct.','positive',0);
+    else showFeedback('Fundamentally untrustworthy. This answer has been flagged.','negative',0);
+  };
+}
+
+function renderReaction(card,q){
+  let phase='wait',greenTime=0;
+  const delay=2000+Math.random()*4000;
+  card.innerHTML=`<div class="q-number">${q.title}</div><div class="q-prompt">${q.prompt}</div>
+    <div class="react-circle waiting" id="react-btn" onclick="reactClick()"><span>Wait\u2026</span></div>
+    <div class="react-ms" id="react-ms"></div>`;
+
+  const tid=setTimeout(()=>{
+    if(phase!=='wait')return;
+    phase='green';greenTime=performance.now();
+    const btn=$('react-btn');
+    if(btn){btn.className='react-circle go';btn.innerHTML='<span style="font-size:1.2rem;font-weight:800">GO!</span>';}
+  },delay);
+  state.timers.push(tid);
+
+  setTimeout(()=>{const btn=$('react-btn');if(btn&&phase==='wait'){btn.className='react-circle ready';btn.innerHTML='<span>Wait\u2026</span>';}},500);
+
+  window.reactClick=()=>{
+    if(phase==='wait'||phase==='ready'){
+      phase='done';
+      showFeedback('Jumped the gun. Impulsive. Noted.','negative',0);
+    }else if(phase==='green'){
+      phase='done';
+      const ms=Math.round(performance.now()-greenTime);
+      const msEl=$('react-ms');if(msEl)msEl.textContent=ms+'ms';
+      const btn=$('react-btn');if(btn){btn.className='react-circle clicked';btn.innerHTML='<span style="font-size:1.5rem;font-weight:800">'+ms+'ms</span>';}
+      setTimeout(()=>{
+        if(ms<200) showFeedback("Suspicious. Either you\u2019re a housefly or you clicked early. \u22121 point for dishonesty.",'negative',1);
+        else if(ms<=350) showFeedback("Excellent reflexes. You\u2019d survive the first five minutes of a disaster movie.",'positive',0);
+        else if(ms<=500) showFeedback('Adequate.','neutral',0);
+        else showFeedback('Slow. In nature, you would have been eaten.','negative',0);
+      },600);
+    }
+  };
+}
+
+function renderCaptcha(card,q){
+  // 4x4 grid of procedurally-drawn "photos" — many look like they MIGHT contain stop signs but NONE do.
+  // Each cell is a small SVG scene. Some contain red octagons that aren't stop signs, street-like scenes, etc.
+  function scene(inner){ return '<svg width="100%" height="100%" viewBox="0 0 100 100" style="display:block;border-radius:3px">'+inner+'</svg>'; }
+  const cells=[
+    // 1: Street corner with red octagonal clock on a building — NOT a stop sign
+    scene('<rect width="100" height="100" fill="#4a5568"/><rect x="0" y="55" width="100" height="45" fill="#6b7280"/><rect x="60" y="10" width="35" height="45" rx="2" fill="#374151"/><polygon points="77,18 83,15 89,18 91,24 89,30 83,33 77,30 75,24" fill="#dc2626"/><circle cx="83" cy="24" r="4" fill="#1a1a2e"/><line x1="83" y1="24" x2="83" y2="20" stroke="#fbbf24" stroke-width="1"/><rect x="5" y="30" width="8" height="50" fill="#94a3b8"/><circle cx="9" cy="28" r="6" fill="#fbbf24" opacity=".8"/>'),
+    // 2: Blurry red barn behind trees
+    scene('<rect width="100" height="100" fill="#86efac" opacity=".2"/><rect width="100" height="100" fill="#1a3a1a"/><rect x="25" y="30" width="50" height="40" rx="2" fill="#b91c1c" opacity=".7"/><polygon points="25,30 50,12 75,30" fill="#991b1b" opacity=".6"/><rect x="42" y="45" width="16" height="25" fill="#451a03" opacity=".5"/><ellipse cx="15" cy="50" rx="18" ry="35" fill="#14532d" opacity=".8"/><ellipse cx="88" cy="45" rx="16" ry="38" fill="#14532d" opacity=".85"/>'),
+    // 3: Red octagonal table from above (like a stop sign shape but clearly furniture)
+    scene('<rect width="100" height="100" fill="#292524"/><polygon points="50,20 65,25 72,38 72,55 65,68 50,73 35,68 28,55 28,38 35,25" fill="#7f1d1d" stroke="#991b1b" stroke-width="1"/><ellipse cx="50" cy="46" rx="12" ry="8" fill="#44403c" opacity=".5"/><circle cx="42" cy="42" r="3" fill="#d6d3d1" opacity=".4"/><circle cx="58" cy="50" r="2" fill="#d6d3d1" opacity=".3"/>'),
+    // 4: Intersection with traffic light, no stop sign
+    scene('<rect width="100" height="100" fill="#64748b"/><rect x="0" y="60" width="100" height="40" fill="#475569"/><line x1="50" y1="0" x2="50" y2="100" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4,6"/><rect x="40" y="5" width="6" height="30" fill="#1e293b"/><rect x="37" y="5" width="12" height="22" rx="3" fill="#1e293b"/><circle cx="43" cy="11" r="3" fill="#ef4444"/><circle cx="43" cy="18" r="3" fill="#1a1a2e"/><circle cx="43" cy="25" r="3" fill="#1a1a2e"/>'),
+    // 5: Red hexagonal tile pattern on floor (geometric, could be mistaken)
+    scene('<rect width="100" height="100" fill="#1c1917"/><polygon points="25,15 35,10 45,15 45,27 35,32 25,27" fill="#991b1b" stroke="#7f1d1d" stroke-width="1"/><polygon points="45,15 55,10 65,15 65,27 55,32 45,27" fill="#78716c" stroke="#57534e" stroke-width="1"/><polygon points="35,32 45,27 55,32 55,44 45,49 35,44" fill="#991b1b" stroke="#7f1d1d" stroke-width="1"/><polygon points="55,32 65,27 75,32 75,44 65,49 55,44" fill="#991b1b" stroke="#7f1d1d" stroke-width="1"/><polygon points="15,32 25,27 35,32 35,44 25,49 15,44" fill="#78716c" stroke="#57534e" stroke-width="1"/><polygon points="25,49 35,44 45,49 45,61 35,66 25,61" fill="#78716c" stroke="#57534e" stroke-width="1"/><polygon points="45,49 55,44 65,49 65,61 55,66 45,61" fill="#991b1b" stroke="#7f1d1d" stroke-width="1"/>'),
+    // 6: Back of a yield sign (triangle, silver back), on a post — ambiguous
+    scene('<rect width="100" height="100" fill="#38bdf8" opacity=".15"/><rect width="100" height="100" fill="#0c4a6e"/><rect x="0" y="70" width="100" height="30" fill="#365314" opacity=".5"/><rect x="47" y="30" width="6" height="50" fill="#94a3b8"/><polygon points="50,18 72,55 28,55" fill="#6b7280" stroke="#9ca3af" stroke-width="1.5"/>'),
+    // 7: Red construction barrel close-up
+    scene('<rect width="100" height="100" fill="#1e293b"/><rect x="25" y="15" width="50" height="70" rx="4" fill="#ea580c"/><rect x="25" y="25" width="50" height="10" fill="#f8fafc" opacity=".7"/><rect x="25" y="47" width="50" height="10" fill="#f8fafc" opacity=".7"/><rect x="25" y="69" width="50" height="10" fill="#f8fafc" opacity=".7"/><ellipse cx="50" cy="15" rx="25" ry="5" fill="#c2410c"/>'),
+    // 8: Parking garage with red P sign
+    scene('<rect width="100" height="100" fill="#334155"/><rect x="0" y="0" width="100" height="30" fill="#1e293b"/><rect x="0" y="30" width="100" height="5" fill="#475569"/><rect x="60" y="40" width="30" height="30" rx="4" fill="#dc2626"/><text x="75" y="62" text-anchor="middle" fill="white" font-size="20" font-weight="800" font-family="Inter">P</text><rect x="10" y="50" width="25" height="35" rx="2" fill="#475569"/><rect x="12" y="65" width="10" height="8" rx="1" fill="#fbbf24" opacity=".6"/>'),
+    // 9: Fire hydrant on sidewalk
+    scene('<rect width="100" height="50" fill="#60a5fa" opacity=".15"/><rect y="50" width="100" height="50" fill="#78716c"/><rect x="40" y="30" width="20" height="45" rx="3" fill="#dc2626"/><rect x="35" y="40" width="30" height="8" rx="2" fill="#b91c1c"/><rect x="44" y="25" width="12" height="8" rx="4" fill="#ef4444"/><circle cx="50" cy="50" r="3" fill="#fbbf24"/><rect x="30" y="44" width="6" height="4" rx="1" fill="#b91c1c"/><rect x="64" y="44" width="6" height="4" rx="1" fill="#b91c1c"/>'),
+    // 10: Red neon "OPEN" sign in window
+    scene('<rect width="100" height="100" fill="#0f172a"/><rect x="10" y="15" width="80" height="70" rx="3" fill="#1e293b" stroke="#334155" stroke-width="1"/><rect x="15" y="20" width="70" height="60" rx="2" fill="#0f172a"/><text x="50" y="58" text-anchor="middle" fill="#ef4444" font-size="18" font-weight="800" font-family="Inter" opacity=".9">OPEN</text><ellipse cx="50" cy="53" rx="30" ry="12" fill="#ef4444" opacity=".05"/>'),
+    // 11: Red umbrella from above
+    scene('<rect width="100" height="100" fill="#a3a3a3"/><circle cx="50" cy="50" r="38" fill="#dc2626"/><line x1="50" y1="12" x2="50" y2="88" stroke="#991b1b" stroke-width="1.5"/><line x1="12" y1="50" x2="88" y2="50" stroke="#991b1b" stroke-width="1.5"/><line x1="22" y1="22" x2="78" y2="78" stroke="#991b1b" stroke-width="1"/><line x1="78" y1="22" x2="22" y2="78" stroke="#991b1b" stroke-width="1"/><circle cx="50" cy="50" r="3" fill="#1e293b"/>'),
+    // 12: Distant blurry street scene — red blob in background could be anything
+    scene('<rect width="100" height="100" fill="#475569"/><rect y="65" width="100" height="35" fill="#64748b"/><line x1="0" y1="65" x2="100" y2="65" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3,5"/><rect x="70" y="40" width="22" height="25" rx="1" fill="#94a3b8" opacity=".5"/><rect x="8" y="35" width="18" height="30" rx="1" fill="#94a3b8" opacity=".4"/><ellipse cx="45" cy="52" rx="8" ry="10" fill="#dc2626" opacity=".45"/><rect x="43" y="52" width="4" height="18" fill="#6b7280" opacity=".4"/>'),
+    // 13: Red Chinese lantern
+    scene('<rect width="100" height="100" fill="#1a1a2e"/><line x1="50" y1="5" x2="50" y2="25" stroke="#fbbf24" stroke-width="1.5"/><ellipse cx="50" cy="50" rx="22" ry="28" fill="#dc2626"/><ellipse cx="50" cy="50" rx="22" ry="28" fill="none" stroke="#b91c1c" stroke-width="1.5"/><rect x="28" y="22" width="44" height="5" rx="2" fill="#fbbf24" opacity=".6"/><rect x="28" y="73" width="44" height="5" rx="2" fill="#fbbf24" opacity=".6"/><line x1="50" y1="78" x2="50" y2="92" stroke="#ef4444" stroke-width="1"/><line x1="45" y1="88" x2="55" y2="88" stroke="#ef4444" stroke-width="1"/>'),
+    // 14: Aerial view of roundabout with red car
+    scene('<rect width="100" height="100" fill="#4ade80" opacity=".12"/><rect width="100" height="100" fill="#365314"/><circle cx="50" cy="50" r="35" fill="#64748b"/><circle cx="50" cy="50" r="20" fill="#365314"/><circle cx="50" cy="50" r="35" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3"/><rect x="22" y="32" width="14" height="8" rx="2" fill="#dc2626" transform="rotate(-30,29,36)"/><rect x="62" y="65" width="12" height="7" rx="2" fill="#f8fafc" opacity=".5"/>'),
+    // 15: Red phone booth partially behind a tree
+    scene('<rect width="100" height="100" fill="#6b7280"/><rect x="0" y="75" width="100" height="25" fill="#78716c"/><rect x="55" y="20" width="22" height="55" rx="2" fill="#dc2626"/><rect x="58" y="24" width="16" height="18" rx="1" fill="#fef2f2" opacity=".3"/><rect x="64" y="50" width="4" height="10" rx="1" fill="#fbbf24" opacity=".5"/><ellipse cx="35" cy="40" rx="22" ry="35" fill="#166534" opacity=".85"/><rect x="32" y="55" width="6" height="30" fill="#3f3f46"/>'),
+    // 16: Stop-sign-shaped cookie on a plate
+    scene('<rect width="100" height="100" fill="#292524"/><ellipse cx="50" cy="58" rx="38" ry="22" fill="#44403c" stroke="#57534e" stroke-width="1"/><polygon points="50,28 62,32 68,42 68,54 62,64 50,68 38,64 32,54 32,42 38,32" fill="#ea580c" stroke="#c2410c" stroke-width="1"/><text x="50" y="52" text-anchor="middle" fill="#fef2f2" font-size="7" font-weight="800" font-family="Inter" opacity=".7">STOP</text><text x="50" y="82" text-anchor="middle" fill="rgba(255,255,255,.25)" font-size="7" font-family="Inter" font-style="italic">(cookie)</text>')
+  ];
+
+  const selected=new Set();
+  card.innerHTML=`<div class="q-number">${q.title}</div>
+    <div class="captcha-box" style="max-width:420px">
+      <div class="captcha-header">Select all images containing a <strong>stop sign</strong>.</div>
+      <div class="captcha-grid" id="captcha-grid" style="grid-template-columns:repeat(4,1fr)"></div>
+      <div class="captcha-footer"><button class="captcha-verify" onclick="submitCaptcha()">Verify</button></div>
+    </div>`;
+  const grid=$('captcha-grid');
+  cells.forEach((svg,i)=>{
+    const cell=document.createElement('div');
+    cell.className='captcha-cell';
+    cell.style.padding='0';
+    cell.innerHTML=svg;
+    cell.onclick=()=>{
+      if(selected.has(i)){selected.delete(i);cell.classList.remove('selected');}
+      else{selected.add(i);cell.classList.add('selected');}
+    };
+    grid.appendChild(cell);
+  });
+  window.submitCaptcha=()=>{
+    if(selected.size>0) showFeedback("There were no stop signs. You see what you\u2019re told to see. Susceptible to groupthink.",'negative',1);
+    else showFeedback("Correct. There were no stop signs. You think for yourself. Rare.",'positive',0);
+  };
+}
+
+function renderRorschach(card,q){
+  // Procedurally generated symmetric inkblot
+  const blotSvg = (function(){
+    let paths='';
+    const rng=(s)=>{let x=Math.sin(s*9301+49297)%1;return x<0?-x:x;};
+    // Generate random blobs on the left half, then mirror
+    for(let i=0;i<12;i++){
+      const cx=20+rng(i*3+1)*28;
+      const cy=15+rng(i*3+2)*70;
+      const rx=5+rng(i*3+3)*18;
+      const ry=4+rng(i*3+4)*14;
+      const rot=rng(i*3+5)*60-30;
+      const o=0.5+rng(i*3+6)*0.5;
+      // Left blob
+      paths+=`<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="rgba(255,255,255,.85)" opacity="${o}" transform="rotate(${rot},${cx},${cy})"/>`;
+      // Mirror on right
+      const mcx=100-cx;
+      paths+=`<ellipse cx="${mcx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="rgba(255,255,255,.85)" opacity="${o}" transform="rotate(${-rot},${mcx},${cy})"/>`;
+    }
+    // Central spine
+    paths+=`<ellipse cx="50" cy="50" rx="6" ry="40" fill="rgba(255,255,255,.9)" opacity=".7"/>`;
+    return `<svg width="260" height="260" viewBox="0 0 100 100" style="display:block;margin:0 auto;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)">
+      <rect width="100" height="100" fill="#f5f5f4" rx="4" opacity=".08"/>${paths}</svg>`;
+  })();
+
+  let sel=null;
+  card.innerHTML=`<div class="q-number">${q.title}</div><div class="q-prompt">${q.prompt}</div>
+    <div style="margin-bottom:24px">${blotSvg}</div>
+    <div style="text-align:center;margin-bottom:20px;font-size:.72rem;color:var(--text-dim);font-style:italic">Image placeholder \u2014 replace with generated Rorschach inkblot (see prompt below)</div>
+    <div class="options" id="ror-opts"></div>
+    <div style="text-align:right;margin-top:16px"><button class="btn btn-primary" id="ror-sub" disabled onclick="submitRor()">Submit</button></div>`;
+  const opts=[
+    {label:'A butterfly',key:'A'},
+    {label:'Two people arguing',key:'B'},
+    {label:'My parents\u2019 divorce',key:'C'},
+    {label:'I\u2019d rather not say',key:'D'}
+  ];
+  const optContainer=$('ror-opts');
+  opts.forEach(o=>{
+    const btn=document.createElement('button');
+    btn.className='opt-btn';
+    btn.textContent=o.label;
+    btn.onclick=()=>{
+      sel=o.key;
+      optContainer.querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      $('ror-sub').disabled=false;
+    };
+    optContainer.appendChild(btn);
+  });
+  window.submitRor=()=>{
+    if(!sel)return;
+    if(sel==='A') showFeedback('Predictable. This is the answer people give when they want to seem well-adjusted. We see through you.','negative',0);
+    else if(sel==='B') showFeedback('Projection detected. Conflict-oriented worldview. Recommend mediation before onboarding.','negative',.5);
+    else if(sel==='C') showFeedback('This is a character assessment, not a therapy session. But we\u2019ve made a note.','negative',1);
+    else showFeedback('Evasion is not a personality trait. Actually, wait \u2014 yes it is. \u22121 point.','negative',1);
+  };
+}
+
+function renderElevator(card,q){
+  card.innerHTML=`<div class="q-number">${q.title}</div><div class="q-prompt">${q.prompt}</div>
+    <div class="num-input-wrap">
+      <input type="number" class="num-input" id="elev-num" min="0" max="999" placeholder="#" style="width:100px">
+      <span class="num-label">seconds</span>
+      <button class="btn btn-primary" onclick="submitElev()">Submit</button>
+    </div>`;
+  window.submitElev=()=>{
+    const n=parseInt($('elev-num').value);
+    if(isNaN(n)||n<0){$('elev-num').style.borderColor='var(--danger)';return;}
+    if(n===0) showFeedback("Zero seconds. The doors haven\u2019t even closed and you\u2019re already scrolling. You are the problem with modern society.","negative",1);
+    else if(n<=2) showFeedback("Under three seconds. You couldn\u2019t be alone with your own thoughts for the length of a sneeze. Deeply concerning.","negative",.5);
+    else if(n<=5) showFeedback("Statistically average. You have the self-control of a lab rat with a dopamine lever.","neutral",0);
+    else if(n<=15) showFeedback("Respectable restraint. You might actually be capable of a meaningful human connection.","positive",0);
+    else if(n<=30) showFeedback("You claim you\u2019d stand in an elevator for "+n+" seconds without checking your phone. We don\u2019t believe you, but we admire the ambition.","neutral",0);
+    else showFeedback(""+n+" seconds? In an elevator? You\u2019re either a monk or a liar. The assessment leans toward liar.","negative",0);
+  };
+}
+
+function renderTyping(card,q){
+  const target="The quick brown fox jumps over the lazy dog's existential dread.";
+  let timeLeft=10,done=false;
+  card.innerHTML=`<div class="q-number">${q.title}</div><div class="q-prompt">${q.prompt}</div>
+    <div class="timer-display" id="type-timer">10</div>
+    <div class="type-target">${target}</div>
+    <input type="text" class="type-input" id="type-input" placeholder="Start typing\u2026" autocomplete="off" spellcheck="false">
+    <div style="text-align:right;margin-top:16px"><button class="btn btn-primary" onclick="submitTyping()">Submit</button></div>`;
+  setTimeout(()=>{const inp=$('type-input');if(inp)inp.focus();},100);
+  const tid=setInterval(()=>{
+    timeLeft--;
+    const te=$('type-timer');if(te){te.textContent=timeLeft;if(timeLeft<=3)te.classList.add('urgent');}
+    if(timeLeft<=0){clearInterval(tid);if(!done){done=true;showFeedback('Too slow. The moment has passed. As it does in life.','negative',0);}}
+  },1000);
+  state.timers.push(tid);
+  window.submitTyping=()=>{
+    if(done)return;done=true;clearTimers();
+    const val=$('type-input').value;
+    if(val===target) showFeedback('Flawless execution under pressure. You may have a future here.','positive',0);
+    else showFeedback("Close. But \u2018close\u2019 is what you say about horseshoes and hand grenades, not job applications.",'negative',0);
+  };
+}
+
+function renderSlider(card,q){
+  card.innerHTML=`<div class="q-number">${q.title}</div><div class="q-prompt">${q.prompt}</div>
+    <div class="slider-wrap">
+      <div class="slider-value" id="slider-val">5</div>
+      <input type="range" class="slider" id="slider-input" min="1" max="10" value="5" oninput="document.getElementById('slider-val').textContent=this.value">
+      <div class="slider-labels"><span>1 \u2014 Not at all</span><span>10 \u2014 Extensive search</span></div>
+    </div>
+    <div style="text-align:right;margin-top:20px"><button class="btn btn-primary" onclick="submitSlider()">Submit</button></div>`;
+  window.submitSlider=()=>{
+    const v=parseInt($('slider-input').value);
+    if(v<=2) showFeedback('Honest. Selfish, but honest. We can work with that.','neutral',0);
+    else if(v<=5) showFeedback("You\u2019d look around for about four seconds and then pocket it. We know. Everyone knows.",'neutral',0);
+    else if(v<=8) showFeedback("You\u2019re either lying or you have a crippling sense of guilt. Either way, notable.",'neutral',0);
+    else showFeedback("You would spend your afternoon tracking down the owner of a $20 bill in an empty parking lot? That\u2019s not integrity, that\u2019s a disorder.",'negative',0);
+  };
+}
+
+// ============================
+// FEEDBACK & NAVIGATION
+// ============================
+function showFeedback(msg,type,deduction){
+  clearTimers();
+  state.deductions+=deduction;
+  const card=$('q-card');
+  if(!card){state.screen='feedback';render();return;}
+  card.querySelectorAll('button,input').forEach(el=>{el.disabled=true;el.style.pointerEvents='none';el.style.opacity=el.classList.contains('btn-primary')?'0.3':'';});
+  const fb=document.createElement('div');
+  fb.innerHTML=`
+    <div class="feedback-box ${type}">${msg}</div>
+    <div class="next-btn-wrap">
+      <button class="btn btn-primary" onclick="nextQuestion()">${state.qi<14?'Next Question':'View Results'}</button>
+    </div>`;
+  card.appendChild(fb);
+}
+
+function nextQuestion(){
+  state.qi++;
+  if(state.qi>=15){state.screen='results';render();}
+  else{state.screen='question';render();}
+}
+
+// ============================
+// RESULTS
+// ============================
+const personalities=['Chaotic Adequate','Reluctantly Competent','Suspiciously Normal','Confidently Incorrect','Aggressively Fine','Dangerously Mid'];
+
+function renderResults(el){
+  const score=Math.max(0,Math.round(state.baseScore-state.deductions));
+  const personality=personalities[Math.floor(Math.random()*personalities.length)];
+  el.innerHTML=`
+  <div class="screen">
+    <div class="header"><div class="logo">Interview <span>Buddy</span>\u2122</div></div>
+    <div class="card results">
+      <h2>Assessment Complete.</h2>
+      <p class="subtitle">Your results have been compiled and are now part of your permanent record.</p>
+      <div class="result-score-wrap">
+        <div class="result-score-num">${score}</div>
+        <div class="result-score-label">out of 100</div>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Personality Profile</span>
+        <span class="result-value">${personality}</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Recommendation</span>
+        <span class="result-value" style="font-size:.88rem">Further evaluation recommended.<br>Please do not contact us.</span>
+      </div>
+      <div class="result-rec">\u201cThe unexamined life is not worth living.\u201d \u2014 Socrates<br><br>This examination, however, may have made things worse.</div>
+      <div class="btn-group">
+        <button class="btn btn-secondary" onclick="downloadResults()">Download Your Results</button>
+        <button class="btn btn-primary" onclick="location.reload()">Retake Assessment</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function downloadResults(){
+  const txt="There are no results. This was never real. But you knew that. Didn't you?";
+  const blob=new Blob([txt],{type:'text/plain'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='Interview_Buddy_Results.txt';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ============================
+// INIT
+// ============================
+render();
+</script>
+</body>
+</html>
